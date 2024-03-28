@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="gremlins.AttackTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2024-03-28T18:06:42" hostname="wangyikaideAir.lan" time="4.97">
+  <properties/>
+  <testcase name="AttackCollision()" classname="gremlins.AttackTest" time="4.953"/>
+  <testcase name="AttackTick()" classname="gremlins.AttackTest" time="0.001"/>
+  <testcase name="AttackGetXY()" classname="gremlins.AttackTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Warning: the font "Times" is not available, so "Lucida Bright" has been substituted, but may have unexpected appearance or behavor. Re-enable the "Times" font to remove this warning.
+]]></system-err>
+</testsuite>

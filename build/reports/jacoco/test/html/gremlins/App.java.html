@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gremlins_scaffold</a> &gt; <a href="index.source.html" class="el_package">gremlins</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package gremlins;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+import processing.data.JSONObject;
+import processing.data.JSONArray;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.io.*;
+
+public class App extends PApplet {
+
+    /**
+     * Width of window
+     */
+    public static final int WIDTH = 720;
+    /**
+     * Height of window
+     */
+    public static final int HEIGHT = 720;
+    /**
+     * Number of frames per sec
+     */
+    public static final int FPS = 60;
+
+    /**
+     * Path of config file
+     */
+    public String configPath;
+    
+    /**
+     * Images of brickwall
+     */
+    public PImage brickwall, brickwall_destroy_0, brickwall_destroy_1, brickwall_destroy_2, brickwall_destroy_3;
+    /**
+     * Image of stonewall
+     */
+    public PImage stonewall;
+    /**
+     * Image of exit
+     */
+    public PImage portal;
+    /**
+     * Image of fireball
+     */
+    public PImage fireball_image;
+    /**
+     * Images of wizard facing different direction
+     */
+    public PImage wizard_left ,wizard_right, wizard_up, wizard_down;
+    /**
+     * Images enemies, and it attack
+     */
+    public PImage gremlin, slime, redgremlin, redslime;
+    /**
+     * Image of progress bar and its background
+     */
+    public PImage progress_bar_bg, progress_bar;
+    /**
+     * Image of shield, and its effect on wizard
+     */
+    public PImage shield, shield_effect;
+    
+    /**
+     *Player
+     */
+    public Wizard wizard;
+
+    /**
+     * Game map
+     */
+    public GameMap map;
+
+    /**
+     * Figures of lives
+     */
+    public int current_lives, total_lives;
+    /**
+     * Figures of level
+     */
+    public int current_level, total_level;
+    /**
+     * The counter starts to work after player wins or loses in case game restart immediately
+     */
+<span class="fc" id="L89">    public int restart_countdown = 0;</span>
+    /**
+     * Cooldown of character
+     */
+    public double wizard_cooldown, enemy_cooldown;
+    /**
+     * Win and lose status. they are both false by default
+     */
+<span class="fc" id="L97">    public boolean win = false, lose = false;</span>
+    /**
+     * Key board pressed status. it is false by default
+     */
+<span class="fc" id="L101">    public boolean keypressed = false;</span>
+
+    /**
+     * List of storing the name of different map files with different level
+     */
+<span class="fc" id="L106">    public List&lt;String&gt; layout = new ArrayList&lt;String&gt;();</span>
+    /**
+     * Wizard cooldown of different level
+     */
+<span class="fc" id="L110">    public List&lt;Double&gt; wizard_cooldowns = new ArrayList&lt;Double&gt;();</span>
+    /**
+     * Enemy cooldown of different level
+     */
+<span class="fc" id="L114">    public List&lt;Double&gt; enemy_cooldowns = new ArrayList&lt;Double&gt;();</span>
+    /**
+     * Fireballs discharged by wizard
+     */
+<span class="fc" id="L118">    public List&lt;Fireball&gt; fireballs = new ArrayList&lt;Fireball&gt;();</span>
+    /**
+     * Gremlins read from map
+     */
+<span class="fc" id="L122">    public List&lt;Gremlin&gt; gremlins = new ArrayList&lt;Gremlin&gt;();</span>
+    /**
+     * Slimes discharged by gremlin
+     */
+<span class="fc" id="L126">    public List&lt;Slime&gt; slimes = new ArrayList&lt;Slime&gt;();</span>
+    /**
+     * Red gremlins read from map
+     */
+<span class="fc" id="L130">    public List&lt;RedGremlin&gt; redgremlins = new ArrayList&lt;RedGremlin&gt;();</span>
+    /**
+     * Red slimes discharged by red gremlin
+     */
+<span class="fc" id="L134">    public List&lt;RedSlime&gt; redslimes = new ArrayList&lt;RedSlime&gt;();</span>
+
+    /**
+     * Constructor of App
+     */
+<span class="fc" id="L139">    public App() {</span>
+<span class="fc" id="L140">        this.configPath = &quot;config.json&quot;;</span>
+<span class="fc" id="L141">    }</span>
+
+    /**
+     * Initialise the setting of the window size.
+    */
+    public void settings() {
+<span class="nc" id="L147">        size(WIDTH, HEIGHT);</span>
+<span class="nc" id="L148">    }</span>
+
+    /**
+     * Load all resources such as images. Initialise the elements such as the player, enemies and map elements.
+    */
+    public void setup(){
+<span class="nc" id="L154">        frameRate(FPS);</span>
+
+        // Load images during setup
+<span class="nc" id="L157">        this.stonewall = loadImage(this.getClass().getResource(&quot;stonewall.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L158">        this.brickwall = loadImage(this.getClass().getResource(&quot;brickwall.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L159">        this.brickwall_destroy_0 = loadImage(this.getClass().getResource(&quot;brickwall_destroyed0.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L160">        this.brickwall_destroy_1 = loadImage(this.getClass().getResource(&quot;brickwall_destroyed1.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L161">        this.brickwall_destroy_2 = loadImage(this.getClass().getResource(&quot;brickwall_destroyed2.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L162">        this.brickwall_destroy_3 = loadImage(this.getClass().getResource(&quot;brickwall_destroyed3.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+        
+<span class="nc" id="L164">        this.portal = loadImage(this.getClass().getResource(&quot;portal.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L165">        this.gremlin = loadImage(this.getClass().getResource(&quot;gremlin.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L166">        this.slime = loadImage(this.getClass().getResource(&quot;slime.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L167">        this.redgremlin = loadImage(this.getClass().getResource(&quot;red_gremlin.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L168">        this.redslime = loadImage(this.getClass().getResource(&quot;red_slime.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L169">        this.fireball_image = loadImage(this.getClass().getResource(&quot;fireball.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L170">        this.wizard_left = loadImage(this.getClass().getResource(&quot;wizard0.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L171">        this.wizard_right = loadImage(this.getClass().getResource(&quot;wizard1.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L172">        this.wizard_up = loadImage(this.getClass().getResource(&quot;wizard2.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L173">        this.wizard_down = loadImage(this.getClass().getResource(&quot;wizard3.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L174">        this.progress_bar_bg = loadImage(this.getClass().getResource(&quot;progress_bar_bg.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L175">        this.progress_bar = loadImage(this.getClass().getResource(&quot;progress_bar.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L176">        this.shield = loadImage(this.getClass().getResource(&quot;shield.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+<span class="nc" id="L177">        this.shield_effect = loadImage(this.getClass().getResource(&quot;shield_effect.png&quot;).getPath().replace(&quot;%20&quot;, &quot; &quot;));</span>
+        
+        //read json file
+<span class="nc" id="L180">        JSONObject conf = loadJSONObject(new File(this.configPath));</span>
+<span class="nc" id="L181">        JSONArray jarray = conf.getJSONArray(&quot;levels&quot;);</span>
+<span class="nc" id="L182">        total_level = jarray.size();</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">        for (int i = 0; i &lt; jarray.size(); i++){</span>
+<span class="nc" id="L184">            JSONObject data = jarray.getJSONObject(i);</span>
+<span class="nc" id="L185">            layout.add(data.getString(&quot;layout&quot;));</span>
+<span class="nc" id="L186">            wizard_cooldowns.add(data.getDouble(&quot;wizard_cooldown&quot;));</span>
+<span class="nc" id="L187">            enemy_cooldowns.add(data.getDouble(&quot;enemy_cooldown&quot;));</span>
+        }
+<span class="nc" id="L189">        total_lives = conf.getInt(&quot;lives&quot;);</span>
+<span class="nc" id="L190">        current_lives = total_lives;</span>
+
+        //load map
+<span class="nc" id="L193">        current_level = 1;</span>
+<span class="nc" id="L194">        String map_doc = layout.get(current_level - 1);</span>
+<span class="nc" id="L195">        this.map = new GameMap(map_doc);</span>
+
+<span class="nc" id="L197">        map.ValidMapCheck(layout);</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        if (map.error){System.exit(0);}</span>
+<span class="nc" id="L199">        map.read(this);</span>
+
+        //set cooldown value
+<span class="nc" id="L202">        wizard_cooldown = wizard_cooldowns.get(current_level - 1);</span>
+<span class="nc" id="L203">        enemy_cooldown = enemy_cooldowns.get(current_level - 1);</span>
+<span class="nc" id="L204">    }</span>
+
+    /**
+     * Receive key pressed signal from the keyboard.
+    */
+    public void keyPressed(){
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        if (this.keyCode == 37) {  //Left</span>
+<span class="nc" id="L211">            this.wizard.pressLeft();</span>
+        } 
+<span class="nc bnc" id="L213" title="All 2 branches missed.">        else if (this.keyCode == 39) { //Right</span>
+<span class="nc" id="L214">            this.wizard.pressRight();</span>
+        }
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        else if (this.keyCode == 38) { //Up</span>
+<span class="nc" id="L217">            this.wizard.pressUp();</span>
+        }
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        else if (this.keyCode == 40) { //Down</span>
+<span class="nc" id="L220">            this.wizard.pressDown();</span>
+        }
+<span class="nc bnc" id="L222" title="All 2 branches missed.">        if (this.keyCode == 32) { // Space</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">            if(!this.wizard.get_cooldown_status()){</span>
+<span class="nc" id="L224">                this.wizard.attack(this);</span>
+            }
+        }
+<span class="nc" id="L227">        keypressed = true;</span>
+<span class="nc" id="L228">    }</span>
+    
+    /**
+     * Receive key released signal from the keyboard.
+    */
+    public void keyReleased(){
+<span class="nc bnc" id="L234" title="All 2 branches missed.">        if (this.keyCode == 37) {  //Left</span>
+<span class="nc" id="L235">            this.wizard.releaseLeft();</span>
+        } 
+<span class="nc bnc" id="L237" title="All 2 branches missed.">        if (this.keyCode == 39) { //Right</span>
+<span class="nc" id="L238">            this.wizard.releaseRight();</span>
+        }
+<span class="nc bnc" id="L240" title="All 2 branches missed.">        if (this.keyCode == 38) { //Up</span>
+<span class="nc" id="L241">            this.wizard.releaseUp();</span>
+        }
+<span class="nc bnc" id="L243" title="All 2 branches missed.">        if (this.keyCode == 40) { //Down</span>
+<span class="nc" id="L244">            this.wizard.releaseDown();</span>
+        }
+<span class="nc" id="L246">        keypressed = false;</span>
+<span class="nc" id="L247">    }</span>
+
+
+    /**
+     * Draw all elements in the game by current frame. 
+	 */
+    public void draw() {
+<span class="nc bnc" id="L254" title="All 2 branches missed.">        if (win){</span>
+<span class="nc" id="L255">            background(155, 118, 83);</span>
+<span class="nc" id="L256">            textSize(40);</span>
+<span class="nc" id="L257">            text(&quot;You win&quot;, 280, 350);</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">            if (restart_countdown &lt; 60){restart_countdown += 1;}</span>
+<span class="nc bnc" id="L259" title="All 4 branches missed.">            if(keypressed &amp;&amp; restart_countdown == 60){ // restart st least after 1 sec</span>
+<span class="nc" id="L260">                map.restart(this);</span>
+<span class="nc" id="L261">                win = false;</span>
+<span class="nc" id="L262">                restart_countdown = 0;</span>
+            }
+        }   
+<span class="nc bnc" id="L265" title="All 2 branches missed.">        else if (lose){</span>
+<span class="nc" id="L266">            background(155, 118, 83);</span>
+<span class="nc" id="L267">            textSize(40);</span>
+<span class="nc" id="L268">            text(&quot;Game over&quot;, 250, 350);</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">            if (restart_countdown &lt; 60){restart_countdown += 1;} </span>
+<span class="nc bnc" id="L270" title="All 4 branches missed.">            if(keypressed &amp;&amp; restart_countdown == 60){ // restart st least after 1 sec</span>
+<span class="nc" id="L271">                map.restart(this);</span>
+<span class="nc" id="L272">                lose = false;</span>
+<span class="nc" id="L273">                restart_countdown = 0;</span>
+            }
+        }
+        else{
+<span class="nc" id="L277">            background(155, 118, 83);</span>
+<span class="nc" id="L278">            textSize(15);</span>
+<span class="nc" id="L279">            text(&quot;Lives:&quot;, 10, 690);</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">            for(int i = 0;i &lt; current_lives;i++){</span>
+<span class="nc" id="L281">                this.image(this.wizard_right,55 + i*20 , 675);</span>
+            }
+<span class="nc" id="L283">            text(&quot;Level &quot; + current_level + &quot;/&quot; + total_level,150 ,690);</span>
+<span class="nc" id="L284">            map.generate(this);</span>
+<span class="nc" id="L285">            map.destory_animation(this);</span>
+
+<span class="nc" id="L287">            wizard.tick(this);</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">            for (int i = 0; i &lt; fireballs.size(); i++){</span>
+<span class="nc" id="L289">                fireballs.get(i).tick();  // update fireballs information</span>
+<span class="nc" id="L290">                fireballs.get(i).collision_check(this);  //check fireballs collision</span>
+            }
+<span class="nc bnc" id="L292" title="All 2 branches missed.">            for (int i = 0; i &lt; slimes.size(); i++){</span>
+<span class="nc" id="L293">                slimes.get(i).tick();  // update slimes information</span>
+<span class="nc" id="L294">                slimes.get(i).collision_check(this);  //check slimes collision</span>
+            }
+<span class="nc bnc" id="L296" title="All 2 branches missed.">            for(int i = 0; i &lt; redslimes.size(); i++){</span>
+<span class="nc" id="L297">                redslimes.get(i).tick();</span>
+<span class="nc" id="L298">                redslimes.get(i).collision_check(this);</span>
+            }
+<span class="nc bnc" id="L300" title="All 2 branches missed.">            for(Gremlin g : gremlins){g.tick(this);} //update gremlins</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">            for(RedGremlin r : redgremlins){r.tick(this);}</span>
+<span class="nc" id="L302">            Attack.attack_collision_check(this);</span>
+<span class="nc" id="L303">            Character.character_collision_check(this);</span>
+
+<span class="nc" id="L305">            wizard.draw(this);</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">            for (int i = 0; i &lt; fireballs.size(); i++){fireballs.get(i).draw(this);}  //draw fireballs</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">            for (int i = 0; i &lt; slimes.size(); i++) {slimes.get(i).draw(this);} // draw slimes</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">            for (int i = 0; i &lt; redslimes.size(); i++) {redslimes.get(i).draw(this);}</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">            for(Gremlin g : gremlins){g.draw(this);} //draw gremlins</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">            for(RedGremlin r : redgremlins){r.draw(this);}</span>
+            }
+
+<span class="nc" id="L313">    }</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L316">        PApplet.main(&quot;gremlins.App&quot;);</span>
+<span class="nc" id="L317">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

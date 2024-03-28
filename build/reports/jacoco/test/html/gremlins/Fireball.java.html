@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Fireball.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gremlins_scaffold</a> &gt; <a href="index.source.html" class="el_package">gremlins</a> &gt; <span class="el_source">Fireball.java</span></div><h1>Fireball.java</h1><pre class="source lang-java linenums">package gremlins;
+
+public class Fireball extends Attack{
+
+    /**
+     * Constructor of Fireball, required x and y coordinate, and direction
+     * @param x, x coordinate
+     * @param y, y coordinate
+     * @param direction, the moving direction of fireball
+     * the speed of fireball bydefault is 4
+     */
+    public Fireball(int x, int y, String direction){
+<span class="fc" id="L13">        super(x, y, direction);</span>
+<span class="fc" id="L14">        speed = 4;</span>
+<span class="fc" id="L15">    }</span>
+    
+    /**
+     * Draw fireball to window
+     * @param app, update data to app
+     */
+    public void draw(App app){
+<span class="nc" id="L22">        app.image(app.fireball_image, x, y);</span>
+<span class="nc" id="L23">    }</span>
+
+    /**
+     * Update the location of fireball
+     */
+    public void tick(){
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (direction == &quot;right&quot;) {x += speed;}</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        else if (direction == &quot;left&quot;) {x -= speed;}</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        else if (direction == &quot;up&quot;) {y -= speed;}</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        else if (direction == &quot;down&quot;) {y += speed;}</span>
+<span class="fc" id="L33">    }</span>
+
+    /**
+     * Check the fireball collides brickwall or stonewall
+     * If it hits brickwall, remove the fireball, break the brickwall, and start the breaking animation
+     * If it hits stonewall, just remove the fireball
+     * @param app, update data to app
+     */
+    public void collision_check(App app){
+        int i, j;
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (direction == &quot;right&quot;) {</span>
+<span class="nc" id="L44">            j = (int)(x+20)/20;</span>
+<span class="nc" id="L45">            i = (int)(y+10)/20;</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">            if (app.map.map_objects[i][j] == 'B'){</span>
+<span class="nc" id="L47">                app.map.map_objects[i][j] = ' ';</span>
+<span class="nc" id="L48">                app.fireballs.remove(this);</span>
+<span class="nc" id="L49">                app.map.brick_destory(i, j);</span>
+<span class="nc" id="L50">                return;</span>
+            }
+<span class="nc bnc" id="L52" title="All 2 branches missed.">            else if (app.map.map_objects[i][j] == 'X'){</span>
+<span class="nc" id="L53">                app.fireballs.remove(this);</span>
+<span class="nc" id="L54">                return;</span>
+            }
+        }
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        else if (direction == &quot;left&quot;) {</span>
+<span class="nc" id="L58">            j = (int)x/20;</span>
+<span class="nc" id="L59">            i = (int)(y+10)/20;</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (app.map.map_objects[i][j] == 'B'){</span>
+<span class="nc" id="L61">                app.map.map_objects[i][j] = ' ';</span>
+<span class="nc" id="L62">                app.fireballs.remove(this);</span>
+<span class="nc" id="L63">                app.map.brick_destory(i, j);</span>
+<span class="nc" id="L64">                return;</span>
+            }
+<span class="nc bnc" id="L66" title="All 2 branches missed.">            else if (app.map.map_objects[i][j] == 'X'){</span>
+<span class="nc" id="L67">                app.fireballs.remove(this);</span>
+<span class="nc" id="L68">                return;</span>
+            }
+        }
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        else if (direction == &quot;up&quot;) {</span>
+<span class="nc" id="L72">            j = (int)(x+10)/20;</span>
+<span class="nc" id="L73">            i = (int)y/20;</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            if (app.map.map_objects[i][j] == 'B'){</span>
+<span class="nc" id="L75">                app.map.map_objects[i][j] = ' ';</span>
+<span class="nc" id="L76">                app.fireballs.remove(this);</span>
+<span class="nc" id="L77">                app.map.brick_destory(i, j);</span>
+<span class="nc" id="L78">                return;</span>
+            }
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            else if (app.map.map_objects[i][j] == 'X'){</span>
+<span class="nc" id="L81">                app.fireballs.remove(this);</span>
+<span class="nc" id="L82">                return;</span>
+            }
+        }
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        else if (direction == &quot;down&quot;) {</span>
+<span class="nc" id="L86">            j = (int)(x+10)/20;</span>
+<span class="nc" id="L87">            i = (int)(y+20)/20;</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">            if (app.map.map_objects[i][j] == 'B'){</span>
+<span class="nc" id="L89">                app.map.map_objects[i][j] = ' ';</span>
+<span class="nc" id="L90">                app.fireballs.remove(this);</span>
+<span class="nc" id="L91">                app.map.brick_destory(i, j);</span>
+<span class="nc" id="L92">                return;</span>
+            }
+<span class="nc bnc" id="L94" title="All 2 branches missed.">            else if (app.map.map_objects[i][j] == 'X'){</span>
+<span class="nc" id="L95">                app.fireballs.remove(this);</span>
+<span class="nc" id="L96">                return;</span>
+            }
+        }
+<span class="nc" id="L99">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

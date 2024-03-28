@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Wizard.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gremlins_scaffold</a> &gt; <a href="index.source.html" class="el_package">gremlins</a> &gt; <span class="el_source">Wizard.java</span></div><h1>Wizard.java</h1><pre class="source lang-java linenums">package gremlins;
+
+import processing.core.PImage;
+
+public class Wizard extends Character{
+    /**
+     * Image should be drown to window
+     */
+    private PImage sprite;
+
+    /**
+     * Invincible status of wizard
+     */
+<span class="fc" id="L14">    private boolean invincible = false;</span>
+
+    /**
+     * Invincible time start to count when wizard step on shield
+     */
+<span class="fc" id="L19">    public int invincible_time = 0;</span>
+
+    /**
+     * The movement status of wizard. wizard stop in all direction by default
+     */
+<span class="fc" id="L24">    public boolean left_stop = true ,right_stop = true, up_stop = true, down_stop = true;</span>
+
+    /**
+     * Wizard direction is right by default
+     */
+<span class="fc" id="L29">    public String direction = &quot;right&quot;;</span>
+
+    /**
+     * Constructor of wizard ,required x and y coordinate
+     * @param x, x coordinate
+     * @param y, y coordinate
+     */
+    public Wizard(int x, int y){
+<span class="fc" id="L37">        super(x, y);</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * Change wizard image
+     * @param sprite, image should drown to window created by app
+     */
+    public void setSprite(PImage sprite) {
+<span class="nc" id="L45">        this.sprite = sprite;</span>
+<span class="nc" id="L46">    }</span>
+
+    /**
+     * Draw sprite to window at specified location
+     * @param app, update data to app
+     */
+    public void draw(App app) {
+<span class="nc" id="L53">        app.image(this.sprite, this.x, this.y);</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (cooldown){</span>
+<span class="nc" id="L55">            app.image(app.progress_bar_bg,500, 680);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">            for(int i = 1; i &lt;= (int)(cooldown_count*100/(app.wizard_cooldown*60));i++){</span>
+<span class="nc" id="L57">                app.image(app.progress_bar, 500 + i, 681);</span>
+            }
+        }
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if(invincible){</span>
+<span class="nc" id="L61">            app.image(app.shield_effect, x, y);</span>
+<span class="nc" id="L62">            app.image(app.shield, 240, 665);</span>
+<span class="nc" id="L63">            app.image(app.progress_bar_bg, 270, 675);</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">            for (int i =(int)(180-invincible_time)*100/180; i &gt;= 0; i--){</span>
+<span class="nc" id="L65">                app.image(app.progress_bar, 271 + i, 676);</span>
+            }
+        }
+<span class="nc" id="L68">    }</span>
+
+    /** Update the information of wizard
+     * @param app, update information to app 
+     */
+    public void tick(App app) {
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if(invincible){</span>
+<span class="nc" id="L76">            invincible_time += 1;</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if(invincible_time &gt;= 3*60){ // 3*60 cooldown is 3 sec, 60 is FPS</span>
+<span class="nc" id="L78">                invincible_time = 0;</span>
+<span class="nc" id="L79">                invincible = false;</span>
+            }
+        }
+<span class="nc" id="L82">        cooldown_check(app.wizard_cooldown);</span>
+<span class="nc" id="L83">        nextlevel_check(app);</span>
+<span class="nc" id="L84">        invincible_check(app);</span>
+
+<span class="nc" id="L86">        boolean[] collides = collision(app);  // {right, left, up, down, top-right, buttom-right, top-left, buttom-left} whether can move</span>
+
+<span class="nc bnc" id="L88" title="All 10 branches missed.">        if (moveRight &amp;&amp; moveUp &amp;&amp; !collides[4] &amp;&amp; collides[0] &amp;&amp; collides[2]){return;} //slove corner bug</span>
+<span class="nc bnc" id="L89" title="All 10 branches missed.">        else if (moveRight &amp;&amp; moveDown &amp;&amp; !collides[5] &amp;&amp; collides[0] &amp;&amp; collides[3]){return;}</span>
+<span class="nc bnc" id="L90" title="All 10 branches missed.">        else if (moveLeft &amp;&amp; moveUp &amp;&amp; !collides[6] &amp;&amp; collides[1] &amp;&amp; collides[2]){return;}</span>
+<span class="nc bnc" id="L91" title="All 10 branches missed.">        else if (moveLeft &amp;&amp; moveDown &amp;&amp; !collides[7] &amp;&amp; collides[1] &amp;&amp; collides[3]){return;}</span>
+
+        else{
+<span class="nc bnc" id="L94" title="All 4 branches missed.">            if (moveLeft &amp;&amp; collides[1]) {this.x -= 2;} </span>
+<span class="nc bnc" id="L95" title="All 4 branches missed.">            if (moveRight &amp;&amp; collides[0]) {this.x += 2;}</span>
+<span class="nc bnc" id="L96" title="All 4 branches missed.">            if (moveUp &amp;&amp; collides[2]) {this.y -= 2;}</span>
+<span class="nc bnc" id="L97" title="All 4 branches missed.">            if (moveDown &amp;&amp; collides[3]) {this.y += 2;}</span>
+        }
+
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (direction == &quot;left&quot;) {setSprite(app.wizard_left);}</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        else if (direction == &quot;right&quot;) {setSprite(app.wizard_right);}</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        else if (direction == &quot;up&quot;) {setSprite(app.wizard_up);}</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        else if (direction == &quot;down&quot;) {setSprite(app.wizard_down);}</span>
+
+<span class="nc bnc" id="L105" title="All 8 branches missed.">        if(left_stop &amp;&amp; right_stop &amp;&amp; up_stop &amp;&amp; down_stop){</span>
+<span class="nc" id="L106">            StayInTile();</span>
+        }
+<span class="nc" id="L108">    }</span>
+
+    /**
+     * Executed when left arrow key is pressed
+     * Set movement status variables and direction
+     */
+    public void pressLeft(){
+<span class="fc" id="L115">        this.moveLeft = true;</span>
+<span class="fc" id="L116">        this.direction = &quot;left&quot;;</span>
+<span class="fc" id="L117">        left_stop = false;</span>
+<span class="fc" id="L118">    }</span>
+
+    /**
+     * Executed when right arrow key is pressed
+     * Set movement status variables and direction
+     */
+    public void pressRight(){
+<span class="nc" id="L125">        this.moveRight = true;</span>
+<span class="nc" id="L126">        this.direction = &quot;right&quot;;</span>
+<span class="nc" id="L127">        right_stop = false;</span>
+<span class="nc" id="L128">    }</span>
+
+    /**
+     * Executed when up arrow key is pressed
+     * Set movement status variables and direction
+     */
+    public void pressUp(){
+<span class="fc" id="L135">        this.moveUp = true;</span>
+<span class="fc" id="L136">        this.direction = &quot;up&quot;;</span>
+<span class="fc" id="L137">        up_stop = false;</span>
+<span class="fc" id="L138">    }</span>
+
+    /**
+     * Executed when down arrow key is pressed
+     * Set movement status variables and direction
+     */
+    public void pressDown(){
+<span class="nc" id="L145">        this.moveDown = true;</span>
+<span class="nc" id="L146">        this.direction = &quot;down&quot;;</span>
+<span class="nc" id="L147">        down_stop = false;</span>
+<span class="nc" id="L148">    }</span>
+
+    /**
+     * Executed when left arrow key is released
+     * Set movement status variables
+     */
+    public void releaseLeft(){
+<span class="fc" id="L155">        this.moveLeft = false;</span>
+<span class="fc" id="L156">        left_stop = true;</span>
+<span class="fc" id="L157">    }</span>
+ 
+    /**
+     * Executed when right arrow key is released
+     * Set movement status variables
+     */
+    public void releaseRight(){
+<span class="nc" id="L164">        this.moveRight = false;</span>
+<span class="nc" id="L165">        right_stop = true;</span>
+<span class="nc" id="L166">    }</span>
+    
+    /**
+     * Executed when up arrow key is released
+     * Set movement status variables
+     */
+    public void releaseUp(){
+<span class="nc" id="L173">        this.moveUp = false;</span>
+<span class="nc" id="L174">        up_stop = true;</span>
+<span class="nc" id="L175">    }</span>
+   
+    /**
+     * Executed when down arrow key is released
+     * Set movement status variables
+     */
+    public void releaseDown(){
+<span class="nc" id="L182">        this.moveDown = false;</span>
+<span class="nc" id="L183">        down_stop = true;</span>
+<span class="nc" id="L184">    }</span>
+
+
+    /**
+     * Create a Fireball base on the location and direction of wizard
+     * Cooldown becomes true after wizard attack
+     * @param app, update data to app
+     */
+    public void attack(App app) {
+<span class="fc" id="L193">        app.fireballs.add(new Fireball(x, y, direction));</span>
+<span class="fc" id="L194">        cooldown = true;</span>
+<span class="fc" id="L195">    }</span>
+
+
+    /**
+     * Let wizard stay in the center of tiles
+     */
+    public void StayInTile(){
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        if (direction == &quot;right&quot;){</span>
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">            if(x%20 != 0){x += 2;}</span>
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">            if(y%20 != 0){y += 2;}</span>
+        }
+<span class="fc bfc" id="L206" title="All 2 branches covered.">        else if (direction == &quot;left&quot;){</span>
+<span class="pc bpc" id="L207" title="1 of 2 branches missed.">            if(x%20 != 0){x -= 2;}</span>
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">            if(y%20 != 0){y -= 2;}</span>
+        }
+<span class="fc bfc" id="L210" title="All 2 branches covered.">        else if (direction == &quot;up&quot;){</span>
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">            if(y%20 != 0){y -= 2;}</span>
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">            if(x%20 != 0){x -= 2;}</span>
+        }
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">        else if (direction == &quot;down&quot;){</span>
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">            if(y%20 != 0){y += 2;}</span>
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">            if(x%20 != 0){x += 2;}</span>
+        }
+<span class="fc" id="L218">    }</span>
+
+
+    /**
+     * If wizard step on the tile where exit locates, go to next level
+     * @param app, update data to app
+     */
+    public void nextlevel_check(App app){
+<span class="nc bnc" id="L226" title="All 4 branches missed.">        if(x == app.map.portal_location[0] &amp;&amp; y == app.map.portal_location[1]){</span>
+<span class="nc" id="L227">            app.map.nextlevel(app);</span>
+        }
+<span class="nc" id="L229">    }</span>
+
+    /**
+     * if wizard steps on the tile where shield locates and shield is availible, wizard becomes invincible for a while
+     * @param app, update data to app
+     */
+    public void invincible_check(App app){
+<span class="nc" id="L236">        boolean used = false;</span>
+<span class="nc bnc" id="L237" title="All 4 branches missed.">        if(x == app.map.shield_location[0] &amp;&amp; y == app.map.shield_location[1]){</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">            if(app.map.powerUp_available){</span>
+<span class="nc" id="L239">                invincible = true;</span>
+<span class="nc" id="L240">                used = true;</span>
+            }
+        }
+<span class="nc bnc" id="L243" title="All 2 branches missed.">        if(used){</span>
+<span class="nc" id="L244">            app.map.powerUp_available = false;</span>
+<span class="nc" id="L245">            app.map.powerUp_count = 0;</span>
+        }
+<span class="nc" id="L247">    }</span>
+
+    /**
+     * wizard, gremlins, and red gremlins go to their original location and reset every figures in game
+     * @param app, update data to app
+     */
+    public void respawn(App app){
+<span class="nc" id="L254">        x = app.map.wizard_location[0];</span>
+<span class="nc" id="L255">        y = app.map.wizard_location[1];</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        for(int i = 0;i &lt; app.gremlins.size();i++){</span>
+<span class="nc" id="L257">            app.gremlins.get(i).setX(app.map.gremlin_location.get(i)[0]);</span>
+<span class="nc" id="L258">            app.gremlins.get(i).setY(app.map.gremlin_location.get(i)[1]);</span>
+        }
+<span class="nc bnc" id="L260" title="All 2 branches missed.">        for(int i = 0; i &lt; app.redgremlins.size(); i++){</span>
+<span class="nc" id="L261">            app.redgremlins.get(i).setX(app.map.redgremlin_location.get(i)[0]);</span>
+<span class="nc" id="L262">            app.redgremlins.get(i).setX(app.map.redgremlin_location.get(i)[0]);</span>
+        }
+<span class="nc" id="L264">    }</span>
+
+    /**
+     * @param status, boolean status set to invincible status
+     */
+    public void setInvincible(boolean status){
+<span class="fc" id="L270">        this.invincible = status;</span>
+<span class="fc" id="L271">    }</span>
+
+    /**
+     * @return invincible status
+     */
+<span class="fc" id="L276">    public boolean getInvincible(){return invincible;}</span>
+
+    /**
+     * @return current sprite
+     */
+<span class="nc" id="L281">    public PImage getSprite(){return this.sprite;}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

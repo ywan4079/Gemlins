@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="gremlins.SlimeTest" tests="1" skipped="1" failures="0" errors="0" timestamp="2024-03-28T18:06:56" hostname="wangyikaideAir.lan" time="1.32">
+  <properties/>
+  <testcase name="SlimeWallCollision()" classname="gremlins.SlimeTest" time="1.32">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

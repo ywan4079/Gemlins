@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gremlins_scaffold</a> &gt; <a href="index.source.html" class="el_package">gremlins</a> &gt; <span class="el_source">GameMap.java</span></div><h1>GameMap.java</h1><pre class="source lang-java linenums">package gremlins;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+/**
+ * Define a exception called InvalidMapException with with message: Invalid Map!
+ * It is thrown when map is invalid
+ */
+class InvalidMapException extends Exception {
+    /**
+     * Constructor of InvalidMapException
+     */
+    public InvalidMapException() {
+<span class="nc" id="L17">        super(&quot;Invalid Map!&quot;);</span>
+<span class="nc" id="L18">    }</span>
+}
+
+public class GameMap{
+
+    /**
+     * Map objects in map. e.g. stonewall, brickwall, shield, and exit
+     */
+<span class="fc" id="L26">    public char[][] map_objects = new char[33][36];</span>
+    /**
+     * The name of map document
+     */
+    private String map_doc;
+    /**
+     * A list of brickwall that is going to be destoryed
+     */
+<span class="fc" id="L34">    public List&lt;int[]&gt; destory_list = new ArrayList&lt;int[]&gt;();</span>
+    /**
+     * A list of brickwall that is going to be remove from destory_list
+     */
+<span class="fc" id="L38">    public List&lt;int[]&gt; brick_remove = new ArrayList&lt;int[]&gt;();</span>
+    /**
+     *  The original locations of gremlins
+     */
+<span class="fc" id="L42">    public List&lt;int[]&gt; gremlin_location = new ArrayList&lt;int[]&gt;();</span>
+
+    /**
+     * The original locations of red gremlins
+     */
+<span class="fc" id="L47">    public List&lt;int[]&gt; redgremlin_location = new ArrayList&lt;int[]&gt;();</span>
+    /**
+     *  The location of shield
+     */
+<span class="fc" id="L51">    public int[] shield_location = new int[2];</span>
+    /**
+     *  The location of exit
+     */
+<span class="fc" id="L55">    public int[] portal_location = new int[2];</span>
+    /**
+     * The original location of wizard
+     */
+<span class="fc" id="L59">    public int[] wizard_location = new int[2];</span>
+    /**
+     * The status of whether the powerup is avilable
+     * It is false by default
+     */
+<span class="fc" id="L64">    public boolean powerUp_available = false;</span>
+    /**
+     * How much time in game is the powerup not available
+     */
+<span class="fc" id="L68">    public int powerUp_count = 0;</span>
+    /**
+     * Error from reading maps
+     * By default, it is false
+     */
+<span class="fc" id="L73">    public boolean error = false;</span>
+
+    /**
+     * Constructor of GameMap, required a file name
+     * @param map_doc, the name of the map document
+     */
+<span class="fc" id="L79">    public GameMap(String map_doc){</span>
+<span class="fc" id="L80">        this.map_doc = map_doc;</span>
+<span class="fc" id="L81">    }</span>
+
+    /**
+     * Read data in specified file name and store it
+     * If the file does not exist, exception is thrown
+     * @param app, read document and update data to variables in app 
+     */
+    public void read(App app){
+<span class="nc" id="L89">        File f = new File(map_doc);</span>
+        try{
+<span class="nc" id="L91">            Scanner scan = new Scanner(f);</span>
+<span class="nc" id="L92">            int i = 0;</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">            while(scan.hasNext()){</span>
+<span class="nc" id="L94">                String line  = scan.nextLine();</span>
+<span class="nc" id="L95">                map_objects[i] = line.toCharArray();</span>
+<span class="nc" id="L96">                i += 1;</span>
+<span class="nc" id="L97">            }</span>
+<span class="nc" id="L98">            scan.close();</span>
+<span class="nc" id="L99">        }catch (FileNotFoundException e){</span>
+<span class="nc" id="L100">            e.printStackTrace();</span>
+<span class="nc" id="L101">        }catch(Exception e){</span>
+<span class="nc" id="L102">            e.printStackTrace();</span>
+<span class="nc" id="L103">        }</span>
+
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        for (int i = 0 ; i &lt; 33 ; i++){ //something do only once</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">            for (int j = 0 ; j &lt; 36 ; j++){</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">                if (map_objects[i][j] == 'W') {</span>
+<span class="nc" id="L108">                    app.wizard = new Wizard(j*20, i*20);</span>
+<span class="nc" id="L109">                    app.wizard.setSprite(app.wizard_right);</span>
+<span class="nc" id="L110">                    wizard_location[0] = j*20;</span>
+<span class="nc" id="L111">                    wizard_location[1] = i*20;</span>
+                }
+<span class="nc bnc" id="L113" title="All 2 branches missed.">                else if (map_objects[i][j] == 'E') {</span>
+<span class="nc" id="L114">                    portal_location[0] = j*20;</span>
+<span class="nc" id="L115">                    portal_location[1] = i*20;</span>
+                }
+<span class="nc bnc" id="L117" title="All 2 branches missed.">                else if (map_objects[i][j] == 'G') {</span>
+<span class="nc" id="L118">                    app.gremlins.add(new Gremlin(j*20, i*20));</span>
+<span class="nc" id="L119">                    int[] location = {j*20, i*20};</span>
+<span class="nc" id="L120">                    gremlin_location.add(location);</span>
+<span class="nc" id="L121">                }</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                else if (map_objects[i][j] == 'S'){</span>
+<span class="nc" id="L123">                    shield_location[0] = j*20;</span>
+<span class="nc" id="L124">                    shield_location[1] = i*20;</span>
+                }
+<span class="nc bnc" id="L126" title="All 2 branches missed.">                else if (map_objects[i][j] == 'R'){</span>
+<span class="nc" id="L127">                    app.redgremlins.add(new RedGremlin(j*20, i*20));</span>
+<span class="nc" id="L128">                    int[] location = {j*20, i*20};</span>
+<span class="nc" id="L129">                    redgremlin_location.add(location);</span>
+                }
+            }
+        }
+<span class="nc" id="L133">    }</span>
+
+    /**
+     * Draw images based on data at specified location in window
+     * @param app, update data to app
+     */
+    public void generate(App app){
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        for (int i = 0 ; i &lt; 33 ; i++){</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">            for (int j = 0 ; j &lt; 36 ; j++){</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">                if (map_objects[i][j] == 'X'){app.image(app.stonewall, j*20, i*20);}</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">                else if (map_objects[i][j] == 'B') {</span>
+<span class="nc" id="L144">                    app.image(app.brickwall, j*20, i*20);</span>
+                }
+<span class="nc bnc" id="L146" title="All 2 branches missed.">                else if (map_objects[i][j] == 'E') {</span>
+<span class="nc" id="L147">                    app.image(app.portal, j*20, i*20);</span>
+                }
+<span class="nc bnc" id="L149" title="All 2 branches missed.">                else if (map_objects[i][j] == 'S'){</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">                    if (powerUp_available){</span>
+<span class="nc" id="L151">                        app.image(app.shield, j*20, i*20);</span>
+                    }
+<span class="nc bnc" id="L153" title="All 2 branches missed.">                    if (powerUp_count &lt; 10 * 60){</span>
+<span class="nc" id="L154">                        powerUp_count += 1;</span>
+                    }
+<span class="nc bnc" id="L156" title="All 2 branches missed.">                    if (powerUp_count == 10 * 60){</span>
+<span class="nc" id="L157">                        powerUp_available = true;</span>
+                    }
+                }
+            }
+        }
+<span class="nc" id="L162">    }</span>
+
+    /**
+     * Open files with the names in layout
+     * If the file does not exist, FileNotFoundException will be thrown
+     * If map is invalid, InvalidMapException will be thrown
+     * @param layout, the name of map file of different level
+     */
+    public void ValidMapCheck(List&lt;String&gt; layout){
+<span class="fc" id="L171">        int wizard_count = 0;</span>
+<span class="fc" id="L172">        int shield_count = 0;</span>
+<span class="fc" id="L173">        int exit_count = 0;</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        for (String l : layout){</span>
+<span class="fc" id="L175">            char[][] map_test = new char[33][36];</span>
+<span class="fc" id="L176">            File f = new File(l);</span>
+            try{
+<span class="fc" id="L178">                Scanner scan = new Scanner(f);</span>
+<span class="fc" id="L179">                int i = 0;</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">                while(scan.hasNext()){</span>
+<span class="fc" id="L181">                    String line  = scan.nextLine();</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">                    if(line.length() != 36){throw new InvalidMapException();}</span>
+<span class="fc" id="L183">                    map_test[i] = line.toCharArray();</span>
+<span class="fc" id="L184">                    i += 1;</span>
+<span class="fc" id="L185">                }</span>
+<span class="fc" id="L186">                scan.close();</span>
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">                if (i != 33){throw new InvalidMapException();}   </span>
+<span class="fc" id="L188">            }catch (FileNotFoundException e){</span>
+<span class="fc" id="L189">                e.printStackTrace();</span>
+<span class="fc" id="L190">                error = true;</span>
+<span class="fc" id="L191">                return;</span>
+<span class="nc" id="L192">            }catch (InvalidMapException e){</span>
+<span class="nc" id="L193">                e.printStackTrace();</span>
+<span class="nc" id="L194">                error = true;</span>
+<span class="nc" id="L195">            }catch(Exception e){</span>
+<span class="nc" id="L196">                e.printStackTrace();</span>
+<span class="nc" id="L197">                error = true;</span>
+<span class="pc" id="L198">            }</span>
+            try{
+<span class="fc bfc" id="L200" title="All 2 branches covered.">                for (int i = 0 ; i &lt; 33 ; i++){</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">                    for (int j = 0 ; j &lt; 36 ; j++){</span>
+<span class="fc bfc" id="L202" title="All 4 branches covered.">                        if (i == 0 || i == 32){</span>
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">                            if(map_test[i][j] != 'X'){throw new InvalidMapException();}</span>
+                        }
+<span class="fc bfc" id="L205" title="All 4 branches covered.">                        if(j == 0 || j == 35){</span>
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">                            if (map_test[i][j] != 'X') {throw new InvalidMapException();}</span>
+                        }
+        
+<span class="fc bfc" id="L209" title="All 2 branches covered.">                        if (map_test[i][j] == 'W') {wizard_count += 1;}</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">                        else if (map_test[i][j] == 'E') {exit_count += 1;}</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">                        else if (map_test[i][j] == 'S'){shield_count += 1;}</span>
+                    }
+                }
+<span class="pc bpc" id="L214" title="3 of 6 branches missed.">                if (wizard_count != 1 || shield_count &gt; 1 || exit_count != 1){throw new InvalidMapException();}  </span>
+<span class="fc" id="L215">                wizard_count = 0;</span>
+<span class="fc" id="L216">                shield_count = 0;</span>
+<span class="fc" id="L217">                exit_count = 0;</span>
+<span class="nc" id="L218">            }catch (InvalidMapException e){</span>
+<span class="nc" id="L219">                e.printStackTrace();</span>
+<span class="nc" id="L220">                error = true;</span>
+<span class="nc" id="L221">            }catch (Exception e){</span>
+<span class="nc" id="L222">                e.printStackTrace();</span>
+<span class="nc" id="L223">                error = true;</span>
+<span class="pc" id="L224">            }</span>
+<span class="fc" id="L225">        }</span>
+<span class="fc" id="L226">    }</span>
+
+
+    /**
+     * Store location and count of brickwall that is going to be destoryed in list
+     * @param x, x coordinate
+     * @param y, y coordinate
+     */
+    public void brick_destory(int x, int y){
+<span class="fc" id="L235">        int[] brick_detail = {x, y, 0};  // 0 is count</span>
+<span class="fc" id="L236">        destory_list.add(brick_detail);</span>
+<span class="fc" id="L237">    }</span>
+
+    /**
+     * Load different images at the same location for brickwalls at different breaking status
+     * @param app, update data to app
+     */
+    public void destory_animation(App app){
+
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        for (int[] l : destory_list){</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">            if (l[2]%4 == 0){</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">                if((int)l[2]/4 == 0){</span>
+<span class="nc" id="L248">                    app.image(app.brickwall_destroy_0, l[1]*20, l[0]*20);</span>
+                }
+<span class="nc bnc" id="L250" title="All 2 branches missed.">                else if((int)l[2]/4 == 1){</span>
+<span class="nc" id="L251">                    app.image(app.brickwall_destroy_1, l[1]*20, l[0]*20);</span>
+                }
+<span class="nc bnc" id="L253" title="All 2 branches missed.">                else if((int)l[2]/4 == 2){</span>
+<span class="nc" id="L254">                    app.image(app.brickwall_destroy_2, l[1]*20, l[0]*20);</span>
+                }
+                else{
+<span class="nc" id="L257">                    app.image(app.brickwall_destroy_3, l[1]*20, l[0]*20);</span>
+                }
+            }
+<span class="nc" id="L260">            l[2] += 1;</span>
+<span class="nc bnc" id="L261" title="All 2 branches missed.">            if(l[2] == 15){</span>
+<span class="nc" id="L262">                brick_remove.add(l);</span>
+            }
+<span class="nc" id="L264">        }</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">        for(int[] l : brick_remove){</span>
+<span class="nc" id="L266">            destory_list.remove(l);</span>
+<span class="nc" id="L267">        }</span>
+<span class="nc" id="L268">        brick_remove.clear();</span>
+<span class="nc" id="L269">    }</span>
+
+    /**
+     * Go to next level when wizard step on exit
+     * Win when wizard reachs exit of last level
+     * @param app, update data to app
+     */
+    public void nextlevel(App app){
+<span class="nc" id="L277">        app.current_level += 1;</span>
+<span class="nc bnc" id="L278" title="All 2 branches missed.">        if (app.current_level &gt; app.total_level){</span>
+<span class="nc" id="L279">            app.win = true;</span>
+        }
+        else{
+<span class="nc" id="L282">            map_doc = app.layout.get(app.current_level - 1);</span>
+<span class="nc" id="L283">            app.wizard_cooldown = app.wizard_cooldowns.get(app.current_level - 1);</span>
+<span class="nc" id="L284">            app.enemy_cooldown = app.enemy_cooldowns.get(app.current_level - 1);</span>
+<span class="nc" id="L285">            app.fireballs.clear();</span>
+<span class="nc" id="L286">            app.slimes.clear();</span>
+<span class="nc" id="L287">            app.redslimes.clear();</span>
+<span class="nc" id="L288">            app.gremlins.clear();</span>
+<span class="nc" id="L289">            app.redgremlins.clear();</span>
+<span class="nc" id="L290">            gremlin_location.clear();</span>
+<span class="nc" id="L291">            redgremlin_location.clear();</span>
+<span class="nc" id="L292">            powerUp_available = false;</span>
+<span class="nc" id="L293">            powerUp_count = 0;</span>
+<span class="nc" id="L294">            read(app);</span>
+        }
+<span class="nc" id="L296">    }</span>
+    /**
+     Restart the game when player press any key after win or lose
+     * @param app, update data to app
+     */
+    public void restart(App app){
+<span class="nc" id="L302">        app.current_lives = app.total_lives;</span>
+<span class="nc" id="L303">        app.current_level = 1;</span>
+<span class="nc" id="L304">        map_doc = app.layout.get(app.current_level - 1);</span>
+<span class="nc" id="L305">        app.wizard_cooldown = app.wizard_cooldowns.get(app.current_level - 1);</span>
+<span class="nc" id="L306">        app.enemy_cooldown = app.enemy_cooldowns.get(app.current_level - 1);</span>
+<span class="nc" id="L307">        app.fireballs.clear();</span>
+<span class="nc" id="L308">        app.gremlins.clear();</span>
+<span class="nc" id="L309">        app.redgremlins.clear();</span>
+<span class="nc" id="L310">        app.slimes.clear();</span>
+<span class="nc" id="L311">        app.redslimes.clear();</span>
+<span class="nc" id="L312">        gremlin_location.clear();</span>
+<span class="nc" id="L313">        redgremlin_location.clear();</span>
+<span class="nc" id="L314">        powerUp_available = false;</span>
+<span class="nc" id="L315">        powerUp_count = 0;</span>
+<span class="nc" id="L316">        read(app);</span>
+<span class="nc" id="L317">    }</span>
+
+    /**
+     * @return the name of current map document
+     */
+<span class="fc" id="L322">    public String getMapDoc(){return map_doc;}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

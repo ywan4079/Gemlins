@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Attack.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gremlins_scaffold</a> &gt; <a href="index.source.html" class="el_package">gremlins</a> &gt; <span class="el_source">Attack.java</span></div><h1>Attack.java</h1><pre class="source lang-java linenums">package gremlins;
+
+import gremlins.App;
+import gremlins.Gremlin;
+import gremlins.Slime;
+import gremlins.Wizard;
+
+import java.util.List;
+import java.util.ArrayList;
+
+public class Attack{
+    
+    /**
+     * Moving direction of attack
+     */
+    protected String direction;
+
+    /**
+     * x,y coordinate
+     */
+    protected int x, y;
+
+    /**
+     * Speed of the attack
+     */
+    protected int speed;
+
+    /**
+     * Constructor of Attack, required x,y coordinate and direction of attack
+     * @param x, x coordinate
+     * @param y, y coordinate
+     * @param direction, direction of attack
+     */
+<span class="fc" id="L34">    public Attack(int x, int y, String direction){</span>
+<span class="fc" id="L35">        this.x = x;</span>
+<span class="fc" id="L36">        this.y = y;</span>
+<span class="fc" id="L37">        this.direction = direction;</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * Detect collision between wizard, fireball, gremlin, red gremlin, and slime, and red slime
+     * If the distance between fireball and slime (or red slime) is less than 20 pixel, they both disappear
+     * If the distance between fireball and gremlin (or red gremlin) is less than 20 pixel
+     * Then, fireball is absorbed, gremlin respawns, and if red gremlin's lives is less or equal to 0, it respwans.
+     * If the distance between slime(or red slime) and wizard is less than 20 pixel, slime vapourised, and wizard respawns.
+     * @param app, update data to app
+     */
+    public static void attack_collision_check(App app){
+<span class="nc" id="L49">        List&lt;Fireball&gt; fireball_delete = new ArrayList&lt;Fireball&gt;();</span>
+<span class="nc" id="L50">        List&lt;Slime&gt; slime_delete = new ArrayList&lt;Slime&gt;();</span>
+<span class="nc" id="L51">        List&lt;RedSlime&gt; redslime_delete = new ArrayList&lt;RedSlime&gt;();</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        for (Fireball f : app.fireballs){  //fireball hit gremlin or slime</span>
+<span class="nc" id="L53">            int f_center_X = f.getX() + 10;</span>
+<span class="nc" id="L54">            int f_center_Y = f.getY() + 10;</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">            for (Slime s : app.slimes){</span>
+<span class="nc" id="L56">                int s_center_X = s.getX() + 10;</span>
+<span class="nc" id="L57">                int s_center_Y = s.getY() + 10;</span>
+<span class="nc" id="L58">                int distance_square = (s_center_X - f_center_X)*(s_center_X - f_center_X) + (s_center_Y - f_center_Y)*(s_center_Y - f_center_Y);</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">                if (distance_square &lt; 400){</span>
+<span class="nc" id="L60">                    fireball_delete.add(f);</span>
+<span class="nc" id="L61">                    slime_delete.add(s);</span>
+                }
+<span class="nc" id="L63">            }</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">            for (Gremlin g : app.gremlins){</span>
+<span class="nc" id="L65">                int g_center_X = g.getX() + 10;</span>
+<span class="nc" id="L66">                int g_center_Y = g.getY() + 10;</span>
+<span class="nc" id="L67">                int distance_square = (g_center_X - f_center_X)*(g_center_X - f_center_X) + (g_center_Y - f_center_Y)*(g_center_Y - f_center_Y);</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">                if(distance_square &lt; 400){</span>
+<span class="nc" id="L69">                    fireball_delete.add(f);</span>
+<span class="nc" id="L70">                    g.respawn(app);</span>
+                }
+<span class="nc" id="L72">            }</span>
+
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            for (RedSlime r : app.redslimes){</span>
+<span class="nc" id="L75">                int r_center_X = r.getX() + 10;</span>
+<span class="nc" id="L76">                int r_center_Y = r.getY() + 10;</span>
+<span class="nc" id="L77">                int distance_square = (r_center_X - f_center_X)*(r_center_X - f_center_X) + (r_center_Y - f_center_Y)*(r_center_Y - f_center_Y);</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">                if (distance_square &lt; 400){</span>
+<span class="nc" id="L79">                    fireball_delete.add(f);</span>
+<span class="nc" id="L80">                    redslime_delete.add(r);</span>
+                }
+<span class="nc" id="L82">            }</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">            for (RedGremlin rg : app.redgremlins){</span>
+<span class="nc" id="L84">                int rg_center_X = rg.getX() + 10;</span>
+<span class="nc" id="L85">                int rg_center_Y = rg.getY() + 10;</span>
+<span class="nc" id="L86">                int distance_square = (rg_center_X - f_center_X)*(rg_center_X - f_center_X) + (rg_center_Y - f_center_Y)*(rg_center_Y - f_center_Y);</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                if(distance_square &lt; 400){</span>
+<span class="nc" id="L88">                    fireball_delete.add(f);</span>
+<span class="nc" id="L89">                    rg.lives -= 1;</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">                    if(rg.lives == 0){</span>
+<span class="nc" id="L91">                        rg.total_lives += 1;</span>
+<span class="nc" id="L92">                        rg.lives = rg.total_lives;</span>
+<span class="nc" id="L93">                        rg.respawn(app);</span>
+                    }
+                }
+<span class="nc" id="L96">            }</span>
+<span class="nc" id="L97">        }</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        for (Slime s : app.slimes){ //slime hit wizard</span>
+<span class="nc" id="L99">            int s_center_X = s.getX() + 10;</span>
+<span class="nc" id="L100">            int s_center_Y = s.getY() + 10;</span>
+<span class="nc" id="L101">            int w_center_X = app.wizard.getX() + 10;</span>
+<span class="nc" id="L102">            int w_center_Y = app.wizard.getY() + 10;</span>
+<span class="nc" id="L103">            int distance_square = (s_center_X - w_center_X)*(s_center_X - w_center_X) + (s_center_Y - w_center_Y)*(s_center_Y - w_center_Y);</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            if (distance_square &lt; 400){</span>
+<span class="nc" id="L105">                slime_delete.add(s);</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">                if(!app.wizard.getInvincible()){</span>
+<span class="nc" id="L107">                    app.current_lives -= 1;</span>
+<span class="nc" id="L108">                    app.wizard.respawn(app);</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">                    if (app.current_lives &lt;= 0){app.lose = true;}</span>
+                }
+            }
+<span class="nc" id="L112">        }</span>
+
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        for (RedSlime r : app.redslimes){ //redslime hit wizard</span>
+<span class="nc" id="L115">            int r_center_X = r.getX() + 10;</span>
+<span class="nc" id="L116">            int r_center_Y = r.getY() + 10;</span>
+<span class="nc" id="L117">            int w_center_X = app.wizard.getX() + 10;</span>
+<span class="nc" id="L118">            int w_center_Y = app.wizard.getY() + 10;</span>
+<span class="nc" id="L119">            int distance_square = (r_center_X - w_center_X)*(r_center_X - w_center_X) + (r_center_Y - w_center_Y)*(r_center_Y - w_center_Y);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">            if (distance_square &lt; 400){</span>
+<span class="nc" id="L121">                redslime_delete.add(r);</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                if(!app.wizard.getInvincible()){</span>
+<span class="nc" id="L123">                    app.current_lives -= 1;</span>
+<span class="nc" id="L124">                    app.wizard.respawn(app);</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">                    if (app.current_lives &lt;= 0){app.lose = true;}</span>
+                }
+            }
+<span class="nc" id="L128">        }</span>
+
+
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        for (Fireball f : fireball_delete){app.fireballs.remove(f);}</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        for (Slime s : slime_delete){app.slimes.remove(s);}</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        for (RedSlime s : redslime_delete){app.redslimes.remove(s);}</span>
+<span class="nc" id="L134">    }</span>
+
+    /**
+     * @return x coordinate
+     */
+<span class="fc" id="L139">    public int getX(){return x;}</span>
+
+    /**
+     * @return y coordinate
+     */
+<span class="fc" id="L144">    public int getY(){return y;}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

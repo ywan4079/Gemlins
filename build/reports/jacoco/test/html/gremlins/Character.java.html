@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Character.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gremlins_scaffold</a> &gt; <a href="index.source.html" class="el_package">gremlins</a> &gt; <span class="el_source">Character.java</span></div><h1>Character.java</h1><pre class="source lang-java linenums">package gremlins;
+
+import processing.core.PImage;
+import gremlins.App;
+import gremlins.Gremlin;
+import processing.core.PApplet;
+
+public class Character{
+
+    /**
+     * x and y coordinate
+     */
+    protected int x, y;
+
+    /**
+     * Counter for cooldown. it increases when cooldown status is true
+     */
+<span class="fc" id="L18">    protected int cooldown_count = 0;</span>
+
+    /**
+     * Cooldown status
+     */
+<span class="fc" id="L23">    protected boolean cooldown = false;</span>
+
+    /**
+     * Moving status. all of them ate false by default
+     */
+<span class="fc" id="L28">    protected boolean moveLeft = false, moveRight = false, moveUp = false, moveDown = false;</span>
+
+    /**
+     * Constructor of Charactor, required x and y coordinate
+     * @param x, x coordinate
+     * @param y, y coordinate
+     */
+<span class="fc" id="L35">    public Character(int x, int y){</span>
+<span class="fc" id="L36">        this.x = x;</span>
+<span class="fc" id="L37">        this.y = y;</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * Detect which direction is not obstacled in 8 direction.
+     * @param app, update data to app
+     * @return the result of whether 8 direction are obstacled
+     */
+    public boolean[] collision(App app){ // {right, left, up, down, right_up, right_down, left_up, left_down} whether can move
+<span class="nc" id="L46">        boolean[] output = {true, true, true, true, true, true, true, true};</span>
+        int i, j;
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if(x%20 == 0){</span>
+<span class="nc" id="L49">            j = (int)(x+20)/20;</span>
+<span class="nc" id="L50">            i = (int)y/20;</span>
+<span class="nc bnc" id="L51" title="All 4 branches missed.">            if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[0] = false;} //right</span>
+
+<span class="nc" id="L53">            j = (int)(x-20)/20;</span>
+<span class="nc bnc" id="L54" title="All 4 branches missed.">            if (app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[1] = false;} //left</span>
+            
+<span class="nc bnc" id="L56" title="All 2 branches missed.">            if (y%20 != 0){</span>
+<span class="nc" id="L57">                j = (int)(x+20)/20;</span>
+<span class="nc" id="L58">                i = (int)y/20 + 1;</span>
+<span class="nc bnc" id="L59" title="All 4 branches missed.">                if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[0] = false;} //right</span>
+
+<span class="nc" id="L61">                j = (int)(x-20)/20;</span>
+<span class="nc bnc" id="L62" title="All 4 branches missed.">                if (app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[1] = false;} //left</span>
+            }
+        }
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (y%20 == 0){</span>
+<span class="nc" id="L66">            j = (int)x/20;</span>
+<span class="nc" id="L67">            i = (int)(y-20)/20;</span>
+<span class="nc bnc" id="L68" title="All 4 branches missed.">            if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[2] = false;} //up</span>
+            
+<span class="nc" id="L70">            i = (int)(y+20)/20;</span>
+<span class="nc bnc" id="L71" title="All 4 branches missed.">            if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[3] = false;} //down</span>
+
+<span class="nc bnc" id="L73" title="All 2 branches missed.">            if (x%20 != 0){</span>
+<span class="nc" id="L74">                j = (int)x/20 + 1;</span>
+<span class="nc" id="L75">                i = (int)(y-20)/20;</span>
+<span class="nc bnc" id="L76" title="All 4 branches missed.">                if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[2] = false;} //up</span>
+
+<span class="nc" id="L78">                i = (int)(y+20)/20;</span>
+<span class="nc bnc" id="L79" title="All 4 branches missed.">                if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[3] = false;} //down</span>
+            }
+
+<span class="nc bnc" id="L82" title="All 4 branches missed.">        if(x%20 == 0 &amp;&amp; y%20 == 0){</span>
+<span class="nc" id="L83">            j = (int)(x+20)/20;</span>
+<span class="nc" id="L84">            i = (int)(y-20)/20;</span>
+<span class="nc bnc" id="L85" title="All 4 branches missed.">            if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[4] = false;} //right_up</span>
+<span class="nc" id="L86">            i = (int)(y+20)/20;</span>
+<span class="nc bnc" id="L87" title="All 4 branches missed.">            if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[5] = false;} //right_down</span>
+
+<span class="nc" id="L89">            j = (int)(x-20)/20;</span>
+<span class="nc" id="L90">            i = (int)(y-20)/20;</span>
+<span class="nc bnc" id="L91" title="All 4 branches missed.">            if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[6] = false;} //left_up</span>
+<span class="nc" id="L92">            i = (int)(y+20)/20;</span>
+<span class="nc bnc" id="L93" title="All 4 branches missed.">            if(app.map.map_objects[i][j] == 'X' || app.map.map_objects[i][j] == 'B'){output[7] = false;} //left_down</span>
+        }
+
+        }
+<span class="nc" id="L97">        return output;</span>
+    }
+
+    /**
+     * @param cooldown, how long is the attack cooldown of this character
+     * If the character stays in cooldown status for longer time than the specified attack cooldown, cooldown status is false
+     */
+    public void cooldown_check(double cooldown){
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (this.cooldown) {</span>
+<span class="fc" id="L106">            cooldown_count += 1;</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">            if (cooldown_count &gt;= (int)(cooldown*60)){  //60 is FPS</span>
+<span class="fc" id="L108">                cooldown_count = 0;</span>
+<span class="fc" id="L109">                this.cooldown = false;</span>
+            }
+        }
+<span class="fc" id="L112">    }</span>
+
+    /**
+     * If the distance between wizard and the gremlins or red gremlins is less than 20 pixel, decrease the lives of wizard by 1 and the wizard respawn when wizard is not invincible
+     * If the lives of wizard is less or equal to 0, then player loses
+     * @param app, update data to app
+     */
+    public static void character_collision_check (App app){
+<span class="nc" id="L120">        int w_center_X = app.wizard.getX() + 10;</span>
+<span class="nc" id="L121">        int w_center_Y = app.wizard.getY() + 10;</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        for (Gremlin g : app.gremlins){</span>
+<span class="nc" id="L123">            int g_center_X = g.getX() + 10;</span>
+<span class="nc" id="L124">            int g_center_Y = g.getY() + 10;</span>
+<span class="nc" id="L125">            int distance_square = (w_center_X - g_center_X)*(w_center_X - g_center_X) + (w_center_Y - g_center_Y)*(w_center_Y - g_center_Y);</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            if (distance_square &lt; 400){</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">                if (!app.wizard.getInvincible()){</span>
+<span class="nc" id="L128">                    app.current_lives -= 1;</span>
+<span class="nc" id="L129">                    app.wizard.respawn(app);</span>
+
+<span class="nc bnc" id="L131" title="All 2 branches missed.">                    if (app.current_lives &lt;= 0){app.lose = true;}</span>
+                }
+            }
+<span class="nc" id="L134">        }</span>
+
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        for (RedGremlin r : app.redgremlins){</span>
+<span class="nc" id="L137">            int r_center_X = r.getX() + 10;</span>
+<span class="nc" id="L138">            int r_center_Y = r.getY() + 10;</span>
+<span class="nc" id="L139">            int distance_square = (w_center_X - r_center_X)*(w_center_X - r_center_X) + (w_center_Y - r_center_Y)*(w_center_Y - r_center_Y);</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">            if (distance_square &lt; 400){</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">                if (!app.wizard.getInvincible()){</span>
+<span class="nc" id="L142">                    app.current_lives -= 1;</span>
+<span class="nc" id="L143">                    app.wizard.respawn(app);</span>
+
+<span class="nc bnc" id="L145" title="All 2 branches missed.">                    if (app.current_lives &lt;= 0){app.lose = true;}</span>
+                }
+            }
+<span class="nc" id="L148">        }</span>
+<span class="nc" id="L149">    }</span>
+
+    /**
+     * @return current cooldown status
+     */
+<span class="fc" id="L154">    public boolean get_cooldown_status(){return this.cooldown;}</span>
+
+    /**
+     * @return x coordinate
+     */
+<span class="fc" id="L159">    public int getX(){return x;}</span>
+    /**
+     * @return y coordinate
+     */
+<span class="fc" id="L163">    public int getY(){return y;}</span>
+
+    /**
+     * @param x, new x coordinate
+     */
+<span class="fc" id="L168">    public void setX(int x){this.x = x;}</span>
+    /**
+     * @param y, new y coordinate
+     */
+<span class="fc" id="L172">    public void setY(int y){this.y = y;}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
